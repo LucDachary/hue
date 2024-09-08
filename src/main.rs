@@ -47,22 +47,14 @@ fn main() -> anyhow::Result<()> {
     // http $HUE/api/$HUE_USER/lights  | jq -r 'pick(.[].name, .[].state.on)'
 
     info!("Listing lights…");
-    hue::list_lights(
-        client.clone(),
-        &BRIDGE_IP.to_string(),
-        &USERNAME.to_string(),
-    )?;
+    hue::list_lights(&client, &BRIDGE_IP.to_string(), &USERNAME.to_string())?;
 
     info!("Listing groups…");
-    hue::list_groups(
-        client.clone(),
-        &BRIDGE_IP.to_string(),
-        &USERNAME.to_string(),
-    )?;
+    hue::list_groups(&client, &BRIDGE_IP.to_string(), &USERNAME.to_string())?;
 
     info!("Turning on light 1…");
     hue::turn_on_light(
-        client.clone(),
+        &client,
         &BRIDGE_IP.to_string(),
         &USERNAME.to_string(),
         &"1".to_string(),
@@ -72,7 +64,7 @@ fn main() -> anyhow::Result<()> {
 
     info!("Turning off light 1…");
     hue::turn_off_light(
-        client.clone(),
+        &client,
         &BRIDGE_IP.to_string(),
         &USERNAME.to_string(),
         &"1".to_string(),
