@@ -5,8 +5,8 @@ use std::collections::HashMap;
 /// List all lights connected to the bridge.
 pub fn list_lights(
     client: &reqwest::blocking::Client,
-    bridge_ip: &String,
-    bridge_user: &String,
+    bridge_ip: &str,
+    bridge_user: &str,
 ) -> anyhow::Result<()> {
     let response = client
         .get(&format!("http://{}/api/{}/lights", bridge_ip, bridge_user))
@@ -27,8 +27,8 @@ pub fn list_lights(
 /// List all groups configured on the bridge.
 pub fn list_groups(
     client: &reqwest::blocking::Client,
-    bridge_ip: &String,
-    bridge_user: &String,
+    bridge_ip: &str,
+    bridge_user: &str,
 ) -> anyhow::Result<()> {
     let response = client
         .get(&format!("http://{}/api/{}/groups", bridge_ip, bridge_user))
@@ -48,9 +48,9 @@ pub fn list_groups(
 
 pub fn turn_on_light(
     client: &reqwest::blocking::Client,
-    bridge_ip: &String,
-    bridge_user: &String,
-    light_id: &String,
+    bridge_ip: &str,
+    bridge_user: &str,
+    light_id: &str,
 ) -> anyhow::Result<()> {
     let response = client
         .put(&format!(
@@ -71,9 +71,9 @@ pub fn turn_on_light(
 
 pub fn turn_off_light(
     client: &reqwest::blocking::Client,
-    bridge_ip: &String,
-    bridge_user: &String,
-    light_id: &String,
+    bridge_ip: &str,
+    bridge_user: &str,
+    light_id: &str,
 ) -> anyhow::Result<()> {
     let response = client
         .put(&format!(
