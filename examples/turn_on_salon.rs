@@ -1,0 +1,35 @@
+use anyhow::Context;
+/// Search for a group named "Séjour", and turn all its lights on.
+use log::info;
+use std::env;
+
+// TODO replace with automated discovery.
+const BRIDGE_IP: &str = "192.168.1.14";
+const USERNAME: &str = "G5yH6nGxpayxZjOiglI-99WeP5T9N0qvnC4FCEZV";
+
+fn main() -> anyhow::Result<()> {
+    let client: reqwest::blocking::Client = match env::var("HTTP_PROXY") {
+        Ok(http_proxy) => reqwest::blocking::Client::builder()
+            .proxy(reqwest::Proxy::http(http_proxy)?)
+            .build()?,
+        Err(_) => {
+            info!("No proxy set. Returning a regular client.");
+            reqwest::blocking::Client::new()
+        }
+    };
+
+    // Not sure there is a way to filter results from the API.
+    // WIP
+    //    let groups =
+    //        hue::list_groups(&client, &BRIDGE_IP, &USERNAME).context("Failed to get groups.")?;
+    //
+    //    for group in groups::values() {
+    //        if group["name"] == "Séjour" {
+    //            let group_id = group["id"].as_str().unwrap();
+    //            info!("Turning on group {}…", group_id);
+    //            hue::turn_on_group(&client, &BRIDGE_IP, &USERNAME, group_id)?;
+    //        }
+    //    }
+
+    Ok(())
+}
