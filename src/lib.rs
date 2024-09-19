@@ -2,6 +2,11 @@ use anyhow::Context;
 use serde_json::Value;
 use std::collections::HashMap;
 
+pub struct Bridge {
+    pub ip: String,
+    pub user: String,
+}
+
 /// List all lights connected to the bridge.
 pub fn list_lights(
     client: &reqwest::blocking::Client,

@@ -3,11 +3,15 @@ use anyhow::Context;
 use log::info;
 use std::env;
 
-// TODO replace with automated discovery.
-const BRIDGE_IP: &str = "192.168.1.14";
-const USERNAME: &str = "G5yH6nGxpayxZjOiglI-99WeP5T9N0qvnC4FCEZV";
+use hue::Bridge;
 
 fn main() -> anyhow::Result<()> {
+    // TODO replace with automated discovery.
+    let bridge = Bridge {
+        ip: String::from("192.168.1.14"),
+        user: String::from("G5yH6nGxpayxZjOiglI-99WeP5T9N0qvnC4FCEZV"),
+    };
+
     let client: reqwest::blocking::Client = match env::var("HTTP_PROXY") {
         Ok(http_proxy) => reqwest::blocking::Client::builder()
             .proxy(reqwest::Proxy::http(http_proxy)?)
