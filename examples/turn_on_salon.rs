@@ -1,16 +1,24 @@
 use anyhow::Context;
 /// Search for a group named "Séjour", and turn all its lights on.
-use log::info;
+use log::{debug, info};
 use std::env;
 
 use hue::Bridge;
 
+const BRIDGE_IP: &str = "192.168.1.14";
+const USERNAME: &str = "G5yH6nGxpayxZjOiglI-99WeP5T9N0qvnC4FCEZV";
+
 fn main() -> anyhow::Result<()> {
+    env_logger::init();
+
     // TODO replace with automated discovery.
     let bridge = Bridge {
         ip: String::from("192.168.1.14"),
         user: String::from("G5yH6nGxpayxZjOiglI-99WeP5T9N0qvnC4FCEZV"),
     };
+
+    println!("Running with the bridge {:#?}", bridge);
+    dbg!(bridge);
 
     let client: reqwest::blocking::Client = match env::var("HTTP_PROXY") {
         Ok(http_proxy) => reqwest::blocking::Client::builder()
@@ -22,18 +30,16 @@ fn main() -> anyhow::Result<()> {
         }
     };
 
-    // Not sure there is a way to filter results from the API.
-    // WIP
-    //    let groups =
-    //        hue::list_groups(&client, &BRIDGE_IP, &USERNAME).context("Failed to get groups.")?;
-    //
-    //    for group in groups::values() {
-    //        if group["name"] == "Séjour" {
-    //            let group_id = group["id"].as_str().unwrap();
-    //            info!("Turning on group {}…", group_id);
-    //            hue::turn_on_group(&client, &BRIDGE_IP, &USERNAME, group_id)?;
-    //        }
-    //    }
+    let groups =
+        hue::list_groups(&client, &BRIDGE_IP, &USERNAME).context("Failed to get groups.")?;
+
+    for group in groups {
+        if group.name == "Séjour" {
+            //            let group_id = group["id"].as_str().unwrap();
+            info!("Turning on group {:?}…", group);
+            //hue::turn_on_group(&client, &BRIDGE_IP, &USERNAME, group_id)?;
+        }
+    }
 
     Ok(())
 }
