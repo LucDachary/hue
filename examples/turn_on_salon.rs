@@ -35,9 +35,11 @@ fn main() -> anyhow::Result<()> {
 
     for group in groups {
         if group.name == "Séjour" {
-            //            let group_id = group["id"].as_str().unwrap();
-            info!("Turning on group {:?}…", group);
-            //hue::turn_on_group(&client, &BRIDGE_IP, &USERNAME, group_id)?;
+            debug!("Browsing all lights of this group to turn them on…");
+            for light_id in group.lights {
+                info!("Turning on light {:?}…", light_id);
+                hue::turn_on_light(&client, &BRIDGE_IP, &USERNAME, &light_id.as_str())?;
+            }
         }
     }
 

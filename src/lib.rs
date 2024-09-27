@@ -1,4 +1,5 @@
 use anyhow::Context;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
 
@@ -8,10 +9,12 @@ pub struct Bridge {
     pub user: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Group {
-    pub id: u8,
+    // TODO get serde_json to ignore this, as it's not present
+    pub id: Option<u8>,
     pub name: String,
+    pub lights: Vec<String>,
 }
 
 /// List all lights connected to the bridge.
@@ -47,23 +50,16 @@ pub fn list_groups(
         .send()
         .with_context(|| format!("Failed to build the HTTP request."))?;
 
-    let groups: HashMap<String, Value> = response
+    let mut groups: HashMap<String, Group> = response
         .json()
         .with_context(|| "Failed to extract JSON from groups list.")?;
 
-    let mut group_names = Vec::new();
-
-    for (id, group) in groups {
-        let name = group["name"].as_str().unwrap();
-        println!("{:>3}: {}", id, name);
-        group_names.push(Group {
-            id: id
-                .parse()
-                .expect(format!("Could not parse group ID {:?} as integer.", id).as_str()),
-            name: name.to_string(),
-        });
+    for (id, group) in &mut groups {
+        println!("{:>3}: {:?}", id, group);
+        group.id = Some(id.parse().expect("Cannot parse group ID into an integer."));
     }
-    Ok(group_names)
+
+    Ok(groups.into_values().collect())
 }
 
 pub fn turn_on_light(
