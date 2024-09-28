@@ -1,6 +1,21 @@
 use anyhow::Context;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
+
+#[derive(Debug)]
+pub struct Bridge {
+    pub ip: String,
+    pub user: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Group {
+    // TODO get serde_json to ignore this, as it's not present
+    pub id: Option<u8>,
+    pub name: String,
+    pub lights: Vec<String>,
+}
 
 /// List all lights connected to the bridge.
 pub fn list_lights(
@@ -29,21 +44,22 @@ pub fn list_groups(
     client: &reqwest::blocking::Client,
     bridge_ip: &str,
     bridge_user: &str,
-) -> anyhow::Result<()> {
+) -> anyhow::Result<Vec<Group>> {
     let response = client
         .get(&format!("http://{}/api/{}/groups", bridge_ip, bridge_user))
         .send()
         .with_context(|| format!("Failed to build the HTTP request."))?;
 
-    let groups: HashMap<String, Value> = response
+    let mut groups: HashMap<String, Group> = response
         .json()
         .with_context(|| "Failed to extract JSON from groups list.")?;
 
-    for (id, group) in groups {
-        let name = group["name"].as_str().unwrap();
-        println!("{:>3}: {}", id, name);
+    for (id, group) in &mut groups {
+        println!("{:>3}: {:?}", id, group);
+        group.id = Some(id.parse().expect("Cannot parse group ID into an integer."));
     }
-    Ok(())
+
+    Ok(groups.into_values().collect())
 }
 
 pub fn turn_on_light(
