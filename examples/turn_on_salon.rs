@@ -5,9 +5,6 @@ use std::env;
 
 use hue::Bridge;
 
-const BRIDGE_IP: &str = "192.168.1.14";
-const USERNAME: &str = "G5yH6nGxpayxZjOiglI-99WeP5T9N0qvnC4FCEZV";
-
 fn main() -> anyhow::Result<()> {
     env_logger::init();
 
@@ -18,7 +15,7 @@ fn main() -> anyhow::Result<()> {
     };
 
     println!("Running with the bridge {:#?}", bridge);
-    dbg!(bridge);
+    dbg!(&bridge);
 
     let client: reqwest::blocking::Client = match env::var("HTTP_PROXY") {
         Ok(http_proxy) => reqwest::blocking::Client::builder()
@@ -30,15 +27,16 @@ fn main() -> anyhow::Result<()> {
         }
     };
 
-    let groups =
-        hue::list_groups(&client, &BRIDGE_IP, &USERNAME).context("Failed to get groups.")?;
+    let groups = bridge
+        .list_groups(&client)
+        .context("Failed to get groups.")?;
 
     for group in groups {
         if group.name == "Séjour" {
             debug!("Browsing all lights of this group to turn them on…");
             for light_id in group.lights {
                 info!("Turning on light {:?}…", light_id);
-                hue::turn_on_light(&client, &BRIDGE_IP, &USERNAME, &light_id.as_str())?;
+                bridge.turn_on_light(&client, &light_id.as_str())?;
             }
         }
     }
