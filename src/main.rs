@@ -46,29 +46,24 @@ fn main() -> anyhow::Result<()> {
     // Get only names and state with `jq`:
     // http $HUE/api/$HUE_USER/lights  | jq -r 'pick(.[].name, .[].state.on)'
 
+    let bridge = hue::Bridge {
+        ip: BRIDGE_IP.to_string(),
+        user: USERNAME.to_string(),
+    };
+
     info!("Listing lights…");
-    hue::list_lights(&client, &BRIDGE_IP.to_string(), &USERNAME.to_string())?;
+    bridge.list_lights(&client)?;
 
     info!("Listing groups…");
-    hue::list_groups(&client, &BRIDGE_IP.to_string(), &USERNAME.to_string())?;
+    bridge.list_groups(&client)?;
 
     info!("Turning on light 1…");
-    hue::turn_on_light(
-        &client,
-        &BRIDGE_IP.to_string(),
-        &USERNAME.to_string(),
-        &"1".to_string(),
-    )?;
+    bridge.turn_on_light(&client, &"1".to_string())?;
 
     sleep(time::Duration::from_secs(2));
 
     info!("Turning off light 1…");
-    hue::turn_off_light(
-        &client,
-        &BRIDGE_IP.to_string(),
-        &USERNAME.to_string(),
-        &"1".to_string(),
-    )?;
+    bridge.turn_off_light(&client, &"1".to_string())?;
 
     Ok(())
 }
